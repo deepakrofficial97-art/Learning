@@ -10,7 +10,10 @@ services:
     environment:
       - FLASK_APP=app.py
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - .:/app     # maps your local folder to container so code changes reflect
 
@@ -25,6 +28,23 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data   # persists DB data even after container stops
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # run SQL on first startup
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: employee_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:

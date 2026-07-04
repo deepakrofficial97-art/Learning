@@ -10,7 +10,7 @@
   "PORT": 5000,
 
   "DATABASE": {
-    "HOST": "localhost",
+    "HOST": "db",
     "PORT": 5432,
     "USERNAME": "postgres",
     "PASSWORD": "password",
@@ -47,7 +47,7 @@
   },
 
   "REDIS": {
-    "HOST": "localhost",
+    "HOST": "redis",
     "PORT": 6379
   },
 

@@ -5,6 +5,7 @@ import pkgutil
 from flask import Flask, Blueprint
 from config import Config
 from extensions import db, jwt, mail, cors, cache, migrate
+from created_db import create_database_if_not_exists
 import models
 import routes
 
@@ -40,6 +41,19 @@ def create_app():
     # Upload folder
     os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
 
+    # Create database if it doesn't exist
+    db_config = Config.SQLALCHEMY_DATABASE_URI
+    # Extract connection parameters from URI
+    from urllib.parse import urlparse
+    parsed = urlparse(db_config)
+    create_database_if_not_exists(
+        db_name=parsed.path.lstrip('/'),
+        user=parsed.username,
+        password=parsed.password,
+        host=parsed.hostname,
+        port=parsed.port or 5432
+    )
+
     # Init extensions
     db.init_app(app)
     jwt.init_app(app)
@@ -52,6 +66,10 @@ def create_app():
         "CACHE_DEFAULT_TIMEOUT": Config.CACHE_TIMEOUT
     })
     migrate.init_app(app, db)
+
+    # Create database tables
+    with app.app_context():
+        db.create_all()
 
     # Auto-register all blueprints
     register_blueprints(app, Config.API_BASE_URL)
