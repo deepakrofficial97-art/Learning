@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+
+  app:
+    build: .
+    container_name: employee_app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+    depends_on:
+      - db
+    volumes:
+      - .:/app     # maps your local folder to container so code changes reflect
+
+  db:
+    image: postgres:15
+    container_name: employee_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: employee_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # persists DB data even after container stops
+
+volumes:
+  pgdata:
