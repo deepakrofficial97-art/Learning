@@ -14,6 +14,45 @@ class Employee(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    @classmethod
+    def get_all_active(cls):
+        return cls.query.filter_by(is_active=True).all()
+
+    @classmethod
+    def get_by_id(cls, employee_id):
+        return cls.query.get(employee_id)
+
+    @classmethod
+    def get_by_email(cls, email):
+        return cls.query.filter_by(email=email).first()
+
+    @classmethod
+    def create_employee(cls, name, email, department=None, salary=None):
+        employee = cls(
+            name=name,
+            email=email,
+            department=department,
+            salary=salary,
+        )
+        db.session.add(employee)
+        db.session.commit()
+        return employee
+
+    @classmethod
+    def update_employee(cls, employee, data):
+        employee.name = data.get("name", employee.name)
+        employee.email = data.get("email", employee.email)
+        employee.department = data.get("department", employee.department)
+        employee.salary = data.get("salary", employee.salary)
+        db.session.commit()
+        return employee
+
+    @classmethod
+    def delete_employee(cls, employee):
+        employee.is_active = False
+        db.session.commit()
+        return employee
+
     def to_dict(self):
         return {
             "id":         self.id,

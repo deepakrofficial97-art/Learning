@@ -46,13 +46,13 @@ def create_app():
     # Extract connection parameters from URI
     from urllib.parse import urlparse
     parsed = urlparse(db_config)
-    create_database_if_not_exists(
-        db_name=parsed.path.lstrip('/'),
-        user=parsed.username,
-        password=parsed.password,
-        host=parsed.hostname,
-        port=parsed.port or 5432
-    )
+    # create_database_if_not_exists(
+    #     db_name=parsed.path.lstrip('/'),
+    #     user=parsed.username,
+    #     password=parsed.password,
+    #     host=parsed.hostname,
+    #     port=parsed.port or 5432
+    # )
 
     # Init extensions
     db.init_app(app)
